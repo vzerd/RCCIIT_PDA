@@ -1,6 +1,18 @@
+import React, { useRef, useState } from 'react';
 import './App.css'
 
 function App() {
+
+
+  const fileInputRef = useRef(null);
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const handleButtonClick = () => {
+    fileInputRef.current.click();
+  };
+  const handleFileChange = (event) => {
+    const files = Array.from(event.target.files);
+    setSelectedFiles(files); 
+  };
 
 
   return (
@@ -14,12 +26,30 @@ function App() {
       <main className="relative z-10 flex flex-1 justify-center gap-4 p-4">
         <div className="w-full max-w-md mx-auto mt-4 my-16 bg-white flex justify-center rounded">
           <div className="absolute w-6 mx-2 mb-3 flex justify-center items-center p-6 gap-32">
-            <button class="bg-[#d6d3d1] hover:bg-[#a1a1aa] text-black text-lg font-semibold py-2 px-8 border border-black rounded-full">Select</button>
-            <button class="bg-[#d6d3d1] hover:bg-[#a1a1aa] text-black text-lg font-semibold py-2 px-8 border border-black rounded-full">Clear</button>
+            <button class="bg-[#d6d3d1] hover:bg-[#a1a1aa] text-black text-lg font-semibold py-1 px-6 border border-black rounded"onClick={handleButtonClick}>Select</button>
+            <button class="bg-[#d6d3d1] hover:bg-[#a1a1aa] text-black text-lg font-semibold py-1 px-6 border border-black rounded"onClick={() => setSelectedFiles([])}>Clear</button>
           </div>
-          <div className="w-full mx-6 my-20 bg-[#d6d3d1] rounded p-4"></div>
+          <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              multiple
+              className="hidden"
+            />
+          <div className="w-full mx-6 my-20 overflow-y-scroll bg-[#d6d3d1] rounded p-4">
+            <h3 className="text-lg font-semibold mx-0 p-0"><span className="bg-[#f5f5f4] px-2">Selected Files:</span></h3>
+            <ul>
+              {selectedFiles.map((file, index) => (
+                <li key={index} className="text-lg text-gray-700">
+                  <a href={URL.createObjectURL(file)} target="_blank" rel="noopener noreferrer" className="text-black hover:underline">
+                    {file.name} ({(file.size / 1024).toFixed(2)} KB)
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
           <div className="absolute w-full max-w-md ml-72 mt-[450px] p-6">
-            <button class="bg-[#d6d3d1] hover:bg-[#a1a1aa] text-black text-lg font-semibold py-2 px-8 border border-black rounded-full">Update</button>
+            <button class="bg-[#d6d3d1] hover:bg-[#a1a1aa] text-black text-lg font-semibold py-1 px-6 border border-black rounded">Update</button>
           </div>
         </div>
         <div className="w-full mt-4 my-16 bg-white rounded"></div>
