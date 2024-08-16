@@ -10,7 +10,8 @@ function App() {
     fileInputRef.current.click();
   };
   const handleFileChange = (event) => {
-    const files = Array.from(event.target.files);
+    const files = Array.from(event.target.files).filter((file) =>
+      file.name.endsWith('.xls') || file.name.endsWith('.xlsx'));
     setSelectedFiles(files); 
   };
 
@@ -31,14 +32,16 @@ function App() {
           </div>
           <input
               type="file"
+              accept=".xls,.xlsx"
               ref={fileInputRef}
+              style={{ display: 'none' }}
               onChange={handleFileChange}
               multiple
               className="hidden"
             />
           <div className="w-full mx-6 my-20 overflow-y-scroll bg-[#d6d3d1] rounded p-4">
             <h3 className="text-lg font-semibold mx-0 p-0"><span className="bg-[#f5f5f4] px-2">Selected Files:</span></h3>
-            <ul>
+            <ul className="list-none p-0">
               {selectedFiles.map((file, index) => (
                 <li key={index} className="text-lg text-gray-700">
                   <a href={URL.createObjectURL(file)} target="_blank" rel="noopener noreferrer" className="text-black hover:underline">
@@ -47,6 +50,9 @@ function App() {
                 </li>
               ))}
             </ul>
+            {selectedFiles.length === 0 && (
+                <div className="mt-28 flex justify-center items-center bg-[#d6d3d1] bg-opacity-80 rounded text-center text-lg font-semibold text-gray-700">No selected file</div>
+              )}
           </div>
           <div className="absolute w-full max-w-md ml-72 mt-[450px] p-6">
             <button class="bg-[#d6d3d1] hover:bg-[#a1a1aa] text-black text-lg font-semibold py-1 px-6 border border-black rounded">Update</button>
