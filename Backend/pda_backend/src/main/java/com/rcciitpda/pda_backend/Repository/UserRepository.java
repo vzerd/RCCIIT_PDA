@@ -6,24 +6,23 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
-import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<Users, Integer> {
 
     @Query("SELECT token FROM Users")
-    List<UUID> getAllTokens();
+    List<String> getAllTokens();
 
-    @Query("SELECT name FROM Users WHERE token = ?1")
-    String getNameByToken(UUID token);
+    @Query("SELECT name FROM Users WHERE password = ?1")
+    String getNameByPassword(String password);
 
     @Modifying
     @Query("UPDATE Users SET token = null WHERE token = ?1")
-    int updateTokenToNull(UUID token);
+    int updateTokenToNull(String token);
 
     @Query("SELECT password FROM Users")
     String getAllPasswords();
 
     @Modifying
     @Query("UPDATE Users SET token = ?1 WHERE password = ?2")
-    int updateTokenByPassword(UUID token, String password);
+    int updateTokenByPassword(String token, String password);
 }
