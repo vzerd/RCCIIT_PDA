@@ -13,7 +13,14 @@ function App() {
     const files = Array.from(event.target.files).filter((file) =>
       file.name.endsWith('.xls') || file.name.endsWith('.xlsx'));
     setSelectedFiles(files); 
+    console.log("Selected files:", files);
   };
+
+  const handleClearFiles = () => {
+    setSelectedFiles([]);
+    fileInputRef.current.value = null;
+  };
+  
 
 
   return (
@@ -28,7 +35,7 @@ function App() {
         <div className="w-full max-w-md mx-auto mt-4 my-16 bg-white flex justify-center rounded">
           <div className="absolute w-6 mx-2 mb-3 flex justify-center items-center p-6 gap-32">
             <button class="bg-[#d6d3d1] hover:bg-[#a1a1aa] text-black text-lg font-semibold py-1 px-6 border border-black rounded"onClick={handleButtonClick}>Select</button>
-            <button class="bg-[#d6d3d1] hover:bg-[#a1a1aa] text-black text-lg font-semibold py-1 px-6 border border-black rounded"onClick={() => setSelectedFiles([])}>Clear</button>
+            <button class="bg-[#d6d3d1] hover:bg-[#a1a1aa] text-black text-lg font-semibold py-1 px-6 border border-black rounded"onClick={handleClearFiles}>Clear</button>
           </div>
           <input
               type="file"
