@@ -2,8 +2,6 @@ package com.rcciitpda.pda_backend.Model;
 
 import jakarta.persistence.*;
 
-import java.util.UUID;
-
 @Entity
 public class Users {
     @Id
@@ -14,7 +12,7 @@ public class Users {
     @Column(nullable = false, length = 100, unique = true)
     private String password;
     @Column(length = 36, unique = true)
-    private UUID token;
+    private String token;
 
     public int getID() {
         return id;
@@ -40,11 +38,11 @@ public class Users {
         this.password = password;
     }
 
-    public UUID getToken() {
+    public String getToken() {
         return token;
     }
 
-    public void setToken(UUID token) {
+    public void setToken(String token) {
         this.token = token;
     }
 }

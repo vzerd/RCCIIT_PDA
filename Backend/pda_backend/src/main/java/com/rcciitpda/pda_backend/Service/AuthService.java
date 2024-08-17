@@ -26,6 +26,7 @@ public class AuthService {
     public ResponseEntity<String> signInService(Users user){
 
         if(user.getPassword() == null || user.getPassword().isBlank()){
+            System.out.println("Error: 1A");
             return new ResponseEntity<>(HttpStatus.valueOf(406));
         }
         try{
@@ -33,18 +34,23 @@ public class AuthService {
             for(String password : passwords){
                 if(user.getPassword().equals(password)){
                     UUID newToken = generateNewToken();
-                    int rowsAffected = userRepository.updateTokenByPassword(newToken, user.getPassword());
+                    int rowsAffected = userRepository.updateTokenByPassword(
+                            newToken.toString(), user.getPassword());
                     if(rowsAffected == 1){
-                        return new ResponseEntity<>("{\"token\":\"" + newToken.toString() + "\","
-                                + "\"user_name\":\"" + userRepository.getNameByToken(newToken) + "\"}",
+                        String name = userRepository.getNameByPassword(password);
+                        return new ResponseEntity<>("{\"token\":\"" + newToken + "\","
+                                + "\"user_name\":\"" + name + "\"}",
                                 HttpStatus.valueOf(200));
                     }
+                    System.out.println("Error: 1B");
                     return new ResponseEntity<>(HttpStatus.valueOf(500));
                 }
             }
+            System.out.println("Error: 1C");
             return new ResponseEntity<>(HttpStatus.valueOf(404));
 
         }catch(DataAccessException e){
+            System.out.println("Error: 1D");
             return new ResponseEntity<>(HttpStatus.valueOf(500));
         }
     }
@@ -52,7 +58,8 @@ public class AuthService {
     @Transactional
     public ResponseEntity<String> signOutService(Users user){
 
-        if(user.getToken() == null || user.getToken().toString().isBlank()){
+        if(user.getToken() == null || user.getToken().isBlank()){
+            System.out.println("Error: 2A");
             return new ResponseEntity<>(HttpStatus.valueOf(406));
         }
         try{
@@ -60,17 +67,19 @@ public class AuthService {
             if(rowsAffected == 1) {
                 return new ResponseEntity<>(HttpStatus.valueOf(200));
             }
+            System.out.println("Error: 2B");
             return new ResponseEntity<>(HttpStatus.valueOf(404));
         }catch(DataAccessException e){
+            System.out.println("Error: 2C");
             return new ResponseEntity<>(HttpStatus.valueOf(500));
         }
     }
 
     private UUID generateNewToken(){
         UUID token = UUID.randomUUID();
-        List<UUID> tokens = userRepository.getAllTokens();
+        List<String> tokens = userRepository.getAllTokens();
         for(int i = 0; i < tokens.size(); i++){
-            if(tokens.get(i) != null && token.toString().equals(tokens.get(i).toString())){
+            if(tokens.get(i) != null && token.toString().equals(tokens.get(i))){
                 token = UUID.randomUUID();
                 i = 0;
             }
