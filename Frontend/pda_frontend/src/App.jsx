@@ -17,7 +17,7 @@ function App() {
   });
 
   const handleLogout=()=>{
-    axios.post('http://localhost:8097/v1/auth/sign_out', {
+    axios.post('http://localhost:8097/api/v1/auth/sign_out', {
       "token" : Cookies.get('token')
     })
     .then(function (response) {
@@ -32,7 +32,7 @@ function App() {
   };
   
   const handleLogin = () => {
-    axios.post('http://localhost:8097/v1/auth/sign_in', {
+    axios.post('http://localhost:8097/api/v1/auth/sign_in', {
       "password" : password
     })
     .then(function (response) {
