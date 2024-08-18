@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class EasterEggController{
-    @GetMapping("api/v1/devs")
+    @GetMapping("/devs")
     String showDevs(){
         return "devs";
     }
