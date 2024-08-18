@@ -8,13 +8,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 @Service
-public class AuthService {
+public class AuthService{
 
     UserRepository userRepository;
     @Autowired
@@ -64,7 +63,7 @@ public class AuthService {
         }
         try{
             int rowsAffected = userRepository.updateTokenToNull(user.getToken());
-            if(rowsAffected == 1) {
+            if(rowsAffected == 1){
                 return new ResponseEntity<>(HttpStatus.valueOf(200));
             }
             System.out.println("Error: 2B");
