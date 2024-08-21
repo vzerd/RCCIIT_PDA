@@ -67,14 +67,14 @@ function App() {
       <div className="flex flex-col min-h-screen">
         <div className="absolute inset-0 bg-[#71717a] z-0"></div>
         <div className="relative z-10 w-full h-24 bg-[#8BD5D3] flex justify-between items-center p-3">
-          <h1 className="text-3xl font-bold text-[#737373] pl-4">RCCIIT <span className="font-bold text-2xl text-[#030712]">Placement Data Analysis</span></h1>
+          <h1 className="text-4xl font-bold text-[#383838] pl-4">RCCIIT <span className="text-3xl text-[#030712]">Placement Data Analysis</span></h1>
           <div className="flex items-center space-x-2 pr-4"></div>
           <div className="flex space-x-2">
             {isLoggedIn ? (
               <>
                 <p className="text-lg">{username}</p>
                 <button onClick={handleLogout} className="bg-gray-200 border rounded px-4 py-1">
-                  Logout
+                  Sign Out
                 </button>
               </>
             ) : (
@@ -86,8 +86,8 @@ function App() {
                   onChange={(e) => setPassword(e.target.value)}
                   className="border rounded px-2 py-1"
                 />
-                <button onClick={handleLogin} className="bg-gray-200 border rounded px-4 py-1">
-                  Login
+                <button onClick={handleLogin} className="bg-gray-200 border rounded px-4 py-1 hover:bg-gray-300">
+                  Sign In
                 </button>
               </>
             )}
@@ -120,11 +120,11 @@ function App() {
                 ))}
               </ul>
               {selectedFiles.length === 0 && (
-                <div className="mt-28 flex justify-center items-center bg-[#d6d3d1] bg-opacity-80 rounded text-center text-lg font-semibold text-gray-700">No selected file</div>
+                <div className="mt-28 flex justify-center items-center bg-[#d6d3d1] bg-opacity-80 rounded text-center text-lg font-semibold text-gray-700">No file selected</div>
               )}
             </div>
             <div className="absolute w-full max-w-md ml-72 mt-[450px] p-6">
-              <button className="bg-[#d6d3d1] hover:bg-[#a1a1aa] text-black text-lg font-semibold py-1 px-6 border border-black rounded">Update</button>
+              <button className="bg-[#d6d3d1] hover:bg-[#a1a1aa] text-black text-lg font-semibold py-1 px-6 border border-black rounded">Upload</button>
             </div>
           </div>
           <div className="w-full mt-4 my-16 bg-white rounded"></div>
