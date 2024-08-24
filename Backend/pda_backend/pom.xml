@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.rcciitpda</groupId>
 	<artifactId>pda_backend</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.1.0</version>
 	<name>pda_backend</name>
 	<description>RCCIIT PDA Backend System.</description>
 	<url/>
@@ -48,6 +48,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+			<version>3.3.2</version>
 		</dependency>
 	</dependencies>
 
