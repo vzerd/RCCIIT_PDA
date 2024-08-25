@@ -1,3 +1,4 @@
+
 import React, { useRef, useState, useEffect } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
@@ -5,6 +6,7 @@ import './App.css';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const fileInputRef = useRef(null);
@@ -47,7 +49,15 @@ function App() {
   };
 
   const handleButtonClick = () => {
-    fileInputRef.current.click();
+    if(isLoggedIn){
+      fileInputRef.current.click();
+      console.log("File selected");
+    } else {
+      setShowPopup(true); 
+    }
+  };
+  const closePopup = () => {
+    setShowPopup(false);
   };
 
   const handleFileChange = (event) => {
@@ -86,10 +96,10 @@ function App() {
                   onChange={(e) => setPassword(e.target.value)}
                   className="border rounded px-2 py-1"
                 />
-                <button onClick={handleLogin} className="bg-gray-200 border rounded px-4 py-1 hover:bg-gray-300">
-                  Sign In
-                </button>
+                <button onClick={handleLogin} className="bg-gray-200 border rounded px-4 py-1 hover:bg-gray-300"> Sign In </button>
               </>
+
+
             )}
           </div>
         </div>
@@ -97,6 +107,14 @@ function App() {
           <div className="w-full max-w-md mx-auto mt-4 my-16 bg-white flex justify-center rounded">
             <div className="absolute w-6 mx-2 mb-3 flex justify-center items-center p-6 gap-32">
               <button className="bg-[#d6d3d1] hover:bg-[#a1a1aa] text-black text-lg font-semibold py-1 px-6 border border-black rounded" onClick={handleButtonClick}>Select</button>
+              {showPopup && (
+                <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+                  <div className="bg-white p-8 rounded shadow-lg w-80 h-32">
+                    <p className="text-lg text-gray-700">Need to Sign in first.</p>
+                    <button className="mt-4 ml-48 bg-[#d6d3d1] hover:bg-[#a1a1aa] text-black font-semibold py-2 px-4 border border-black rounded" onClick={closePopup}> Close </button>
+                  </div>
+                </div>
+              )}
               <button className="bg-[#d6d3d1] hover:bg-[#a1a1aa] text-black text-lg font-semibold py-1 px-6 border border-black rounded" onClick={handleClearFiles}>Clear</button>
             </div>
             <input
