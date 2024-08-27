@@ -7,6 +7,7 @@ import './App.css';
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
+  const [popupText, setPopupText] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const fileInputRef = useRef(null);
@@ -48,14 +49,29 @@ function App() {
     });
   };
 
-  const handleButtonClick = () => {
+  const handleSelectButton = () => {
     if(isLoggedIn){
       fileInputRef.current.click();
-      console.log("File selected");
     } else {
-      setShowPopup(true); 
+      setShowPopup(true);
+      setPopupText('Need to Sign in first.');  
     }
   };
+
+  const handleUploadButton = () => {
+    if(isLoggedIn){
+      if(selectedFiles.length === 0){
+        setShowPopup(true);
+        setPopupText('No file selected.');
+      } else {
+        alert('mock: File uploaded');
+      }
+    } else {
+      setShowPopup(true);
+      setPopupText('Need to Sign in first.'); 
+    }
+  };
+
   const closePopup = () => {
     setShowPopup(false);
   };
@@ -106,7 +122,7 @@ function App() {
         <main className="relative z-10 flex flex-1 justify-center gap-4 p-4">
           <div className="w-full max-w-md mx-auto mt-4 my-16 bg-white flex justify-center rounded">
             <div className="absolute w-6 mx-2 mb-3 flex justify-center items-center p-6 gap-32">
-              <button className="bg-[#d6d3d1] hover:bg-[#a1a1aa] text-black text-lg font-semibold py-1 px-6 border border-black rounded" onClick={handleButtonClick}>Select</button>
+              <button className="bg-[#d6d3d1] hover:bg-[#a1a1aa] text-black text-lg font-semibold py-1 px-6 border border-black rounded" onClick={handleSelectButton}>Select</button>
               {showPopup && (
                 <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
                   <div className="bg-white p-8 rounded shadow-lg w-80 h-32">
@@ -142,7 +158,15 @@ function App() {
               )}
             </div>
             <div className="absolute w-full max-w-md ml-72 mt-[450px] p-6">
-              <button className="bg-[#d6d3d1] hover:bg-[#a1a1aa] text-black text-lg font-semibold py-1 px-6 border border-black rounded">Upload</button>
+              <button className="bg-[#d6d3d1] hover:bg-[#a1a1aa] text-black text-lg font-semibold py-1 px-6 border border-black rounded" onClick={handleUploadButton}>Upload</button>
+              {showPopup && (
+                <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+                  <div className="bg-white p-8 rounded shadow-lg w-80 h-32">
+                    <p className="text-lg text-gray-700">{popupText}</p>
+                    <button className="mt-4 ml-48 bg-[#d6d3d1] hover:bg-[#a1a1aa] text-black font-semibold py-2 px-4 border border-black rounded" onClick={closePopup}> Close </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
           <div className="w-full mt-4 my-16 bg-white rounded"></div>
