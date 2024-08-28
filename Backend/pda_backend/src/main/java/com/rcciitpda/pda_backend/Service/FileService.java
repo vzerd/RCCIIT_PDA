@@ -14,6 +14,8 @@ import java.util.List;
 public class FileService{
 
     UserRepository userRepository;
+    private static String fileName;
+    private static final String dirName = "Saved";
     @Autowired
     public FileService(UserRepository userRepository){
         this.userRepository = userRepository;
@@ -30,13 +32,14 @@ public class FileService{
             List<String> storedTokens = userRepository.getAllTokens();
             for(String storedToken : storedTokens){
                 if(token.equals(storedToken)){
-                    File savedDir = new File("Saved");
+                    File savedDir = new File(dirName);
                     if (!savedDir.exists()){
                         if(!savedDir.mkdirs()){
                             return new ResponseEntity<>(HttpStatus.valueOf(500));
                         }
                     }
-                    File destinationFile = new File(savedDir + File.separator + file.getOriginalFilename());
+                    fileName = file.getOriginalFilename();
+                    File destinationFile = new File(savedDir + File.separator + fileName);
                     file.transferTo(destinationFile.toPath());
                     return new ResponseEntity<>(HttpStatus.valueOf(200));
                 }
@@ -45,5 +48,9 @@ public class FileService{
         }catch(IOException e){
             return new ResponseEntity<>(HttpStatus.valueOf(500));
         }
+    }
+
+    public ResponseEntity<?> getAnalysisService() throws IOException{
+        return new ResponseEntity<>(HttpStatus.valueOf(404));
     }
 }

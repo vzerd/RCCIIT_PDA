@@ -65,17 +65,14 @@ function App() {
             setShowPopup(true);
             setPopupText('No file selected.');
         } else {
-            
             const file = selectedFiles[0]; 
             const formData = new FormData();
             formData.append('file', file);
             formData.append('token',Cookies.get('token'));
-
             fetch('http://localhost:8097/api/v1/file/upload', {
                 method: 'POST',
                 body: formData,
             })
-            .then(response => response.json())
             .then(data => {
               
                 console.log('File uploaded successfully:', data);
