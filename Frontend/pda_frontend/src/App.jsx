@@ -45,7 +45,8 @@ function App() {
       setUsername(response.data.user_name);
     })
     .catch(function (error) {
-      console.log(error);
+      setShowPopup(true);
+      setPopupText('Invalid password');
     });
   };
 
@@ -59,18 +60,36 @@ function App() {
   };
 
   const handleUploadButton = () => {
-    if(isLoggedIn){
-      if(selectedFiles.length === 0){
-        setShowPopup(true);
-        setPopupText('No file selected.');
-      } else {
-        alert('mock: File uploaded');
-      }
+    if (isLoggedIn) {
+        if (selectedFiles.length === 0) {
+            setShowPopup(true);
+            setPopupText('No file selected.');
+        } else {
+            
+            const file = selectedFiles[0]; 
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('token',Cookies.get('token'));
+
+            fetch('http://localhost:8097/api/v1/file/upload', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+              
+                console.log('File uploaded successfully:', data);
+            })
+            .catch(error => {
+                console.error('Error uploading file:', error);
+            });
+        }
     } else {
-      setShowPopup(true);
-      setPopupText('Need to Sign in first.'); 
+        setShowPopup(true);
+        setPopupText('Need to Sign in first.');
     }
-  };
+};
+
 
   const closePopup = () => {
     setShowPopup(false);
