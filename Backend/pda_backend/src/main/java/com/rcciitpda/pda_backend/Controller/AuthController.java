@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@CrossOrigin
+@CrossOrigin(origins = "http://rcciit-pda-webpage.s3-website.ap-south-1.amazonaws.com")
 @RequestMapping("/api/v1/auth")
 public class AuthController{
 
