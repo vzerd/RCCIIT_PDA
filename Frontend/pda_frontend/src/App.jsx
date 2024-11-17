@@ -20,7 +20,7 @@ function App() {
   });
 
   const handleLogout=()=>{
-    axios.post('http://ec2-13-127-22-223.ap-south-1.compute.amazonaws.com:8097/api/v1/auth/sign_out', {
+    axios.post('ec2-13-127-22-223.ap-south-1.compute.amazonaws.com:8097/api/v1/auth/sign_out', {
       "token" : Cookies.get('token')
     })
     .then(function (response) {
@@ -35,7 +35,7 @@ function App() {
   };
   
   const handleLogin = () => {
-    axios.post('http://ec2-13-127-22-223.ap-south-1.compute.amazonaws.com:8097/api/v1/auth/sign_in', {
+    axios.post('ec2-13-127-22-223.ap-south-1.compute.amazonaws.com:8097/api/v1/auth/sign_in', {
       "password" : password
     })
     .then(function (response) {
