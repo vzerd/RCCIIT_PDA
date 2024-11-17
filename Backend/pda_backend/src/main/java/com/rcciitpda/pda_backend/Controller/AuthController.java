@@ -19,6 +19,7 @@ public class AuthController{
     @CrossOrigin(origins = "http://rcciit-pda-webpage.s3-website.ap-south-1.amazonaws.com")
     @PostMapping("/sign_in")
     ResponseEntity<String> signIn(@RequestBody Users user){
+        System.out.println("signin");
         return authService.signInService(user);
     }
 
