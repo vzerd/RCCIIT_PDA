@@ -19,14 +19,12 @@ public class FileController{
         this.fileService = fileService;
     }
 
-    @CrossOrigin
     @PostMapping("/upload")
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file,
                                       @RequestParam("token") String token) throws IOException {
         return fileService.uploadFileService(file, token);
     }
 
-    @CrossOrigin
     @GetMapping("/get_analysis")
     public ResponseEntity<?> getAnalysis() throws IOException{
         return fileService.getAnalysisService();

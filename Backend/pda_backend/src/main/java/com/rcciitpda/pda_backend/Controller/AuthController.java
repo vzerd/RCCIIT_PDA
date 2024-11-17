@@ -17,13 +17,11 @@ public class AuthController{
         this.authService = authService;
     }
 
-    @CrossOrigin
     @PostMapping("/sign_in")
     ResponseEntity<String> signIn(@RequestBody Users user){
         return authService.signInService(user);
     }
 
-    @CrossOrigin
     @PostMapping("/sign_out")
     ResponseEntity<String> signOut(@RequestBody Users user){
         return authService.signOutService(user);
