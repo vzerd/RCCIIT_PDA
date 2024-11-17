@@ -19,12 +19,14 @@ public class FileController{
         this.fileService = fileService;
     }
 
+    @CrossOrigin(origins = "http://rcciit-pda-webpage.s3-website.ap-south-1.amazonaws.com")
     @PostMapping("/upload")
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file,
                                       @RequestParam("token") String token) throws IOException {
         return fileService.uploadFileService(file, token);
     }
 
+    @CrossOrigin(origins = "http://rcciit-pda-webpage.s3-website.ap-south-1.amazonaws.com")
     @GetMapping("/get_analysis")
     public ResponseEntity<?> getAnalysis() throws IOException{
         return fileService.getAnalysisService();
