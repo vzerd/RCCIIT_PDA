@@ -1,7 +1,10 @@
 package com.rcciitpda.pda_backend.Service;
 
+import com.amazonaws.AmazonServiceException;
+import com.amazonaws.services.s3.AmazonS3;
 import com.rcciitpda.pda_backend.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -14,8 +17,10 @@ import java.util.List;
 public class FileService{
 
     UserRepository userRepository;
-    private static String fileName;
-    private static final String dirName = "Saved";
+    @Autowired
+    AmazonS3 s3;
+    @Value("${aws.s3.bucket.name}")
+    private String bucket_name;
     @Autowired
     public FileService(UserRepository userRepository){
         this.userRepository = userRepository;
@@ -32,16 +37,14 @@ public class FileService{
             List<String> storedTokens = userRepository.getAllTokens();
             for(String storedToken : storedTokens){
                 if(token.equals(storedToken)){
-                    File savedDir = new File(dirName);
-                    if (!savedDir.exists()){
-                        if(!savedDir.mkdirs()){
-                            return new ResponseEntity<>(HttpStatus.valueOf(500));
-                        }
+                    String keyName = "input/" + file.getOriginalFilename();
+                    try {
+                        s3.putObject(bucket_name, keyName, file.getInputStream(), null);
+                        return new ResponseEntity<>(HttpStatus.valueOf(200));
+                    } catch (AmazonServiceException e) {
+                        System.err.println(e.getErrorMessage());
+                        return new ResponseEntity<>(HttpStatus.valueOf(500));
                     }
-                    fileName = file.getOriginalFilename();
-                    File destinationFile = new File(savedDir + File.separator + fileName);
-                    file.transferTo(destinationFile.toPath());
-                    return new ResponseEntity<>(HttpStatus.valueOf(200));
                 }
             }
             return new ResponseEntity<>(HttpStatus.valueOf(404));
