@@ -33,7 +33,7 @@ function App() {
       console.log(error);
     });
   };
-  
+
   const handleLogin = () => {
     axios.post('http://ec2-13-127-22-223.ap-south-1.compute.amazonaws.com:8097/api/v1/auth/sign_in', {
       "password" : password
@@ -55,7 +55,7 @@ function App() {
       fileInputRef.current.click();
     } else {
       setShowPopup(true);
-      setPopupText('Need to Sign in first.');  
+      setPopupText('Need to Sign in first.');
     }
   };
 
@@ -65,16 +65,16 @@ function App() {
             setShowPopup(true);
             setPopupText('No file selected.');
         } else {
-            const file = selectedFiles[0]; 
+            const file = selectedFiles[0];
             const formData = new FormData();
             formData.append('file', file);
             formData.append('token',Cookies.get('token'));
-            fetch('http://localhost:8097/api/v1/file/upload', {
+            fetch('http://ec2-13-127-22-223.ap-south-1.compute.amazonaws.com:8097/api/v1/file/upload', {
                 method: 'POST',
                 body: formData,
             })
             .then(data => {
-              
+
                 console.log('File uploaded successfully:', data);
             })
             .catch(error => {
@@ -173,7 +173,7 @@ function App() {
                 <div className="mt-28 flex justify-center items-center bg-[#d6d3d1] bg-opacity-80 rounded text-center text-lg font-semibold text-gray-700">No file selected</div>
               )}
             </div>
-            <div className="absolute w-full max-w-md ml-72 mt-[450px] p-6">
+            <div className="absolute w-full max-w-md ml-72 mt-[430px] p-6">
               <button className="bg-[#d6d3d1] hover:bg-[#a1a1aa] text-black text-lg font-semibold py-1 px-6 border border-black rounded" onClick={handleUploadButton}>Upload</button>
               {showPopup && (
                 <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
