@@ -20,7 +20,7 @@ function App() {
   });
 
   const handleLogout=()=>{
-    axios.post('http://ec2-13-127-22-223.ap-south-1.compute.amazonaws.com:8097/api/v1/auth/sign_out', {
+    axios.post('http://ec2-15-206-84-53.ap-south-1.compute.amazonaws.com:8097/api/v1/auth/sign_out', {
       "token" : Cookies.get('token')
     })
     .then(function (response) {
@@ -35,7 +35,7 @@ function App() {
   };
 
   const handleLogin = () => {
-    axios.post('http://ec2-13-127-22-223.ap-south-1.compute.amazonaws.com:8097/api/v1/auth/sign_in', {
+    axios.post('http://ec2-15-206-84-53.ap-south-1.compute.amazonaws.com:8097/api/v1/auth/sign_in', {
       "password" : password
     })
     .then(function (response) {
@@ -69,7 +69,7 @@ function App() {
             const formData = new FormData();
             formData.append('file', file);
             formData.append('token',Cookies.get('token'));
-            fetch('http://ec2-13-127-22-223.ap-south-1.compute.amazonaws.com:8097/api/v1/file/upload', {
+            fetch('http://ec2-15-206-84-53.ap-south-1.compute.amazonaws.com:8097/api/v1/file/upload', {
                 method: 'POST',
                 body: formData,
             })
