@@ -134,6 +134,7 @@ function App() {
         } else if (response.status === 400) {
           setPopupText("Bad request. Please check the file format.");
         } else if (response.status === 404) {
+          handleClearFiles();
           setPopupText("Session expired. Resetting...");
           Cookies.remove('token');
           Cookies.remove('user_name');
