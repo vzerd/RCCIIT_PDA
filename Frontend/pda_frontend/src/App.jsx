@@ -7,106 +7,147 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [popupText, setPopupText] = useState('');
+  const [isWaiting, setIsWaiting] = useState(false); // Tracks waiting time
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const fileInputRef = useRef(null);
   const [selectedFiles, setSelectedFiles] = useState([]);
-  const [uploadedFileIndex, setUploadedFileIndex] = useState(null); // Tracks uploaded file index
+  const [uploadedFileIndex, setUploadedFileIndex] = useState(null);
 
   useEffect(() => {
-    if (Cookies.get('token') !== undefined && Cookies.get('user_name') !== undefined) {
+    if (Cookies.get('token') && Cookies.get('user_name')) {
       setIsLoggedIn(true);
       setUsername(Cookies.get('user_name'));
     }
-  });
+  }, []);
 
   const closePopup = () => {
-    setShowPopup(false);
-  };
-
-  const handleLogout = () => {
-    axios
-      .post('http://ec2-15-206-84-53.ap-south-1.compute.amazonaws.com:8097/api/v1/auth/sign_out', {
-        token: Cookies.get('token'),
-      })
-      .then(function () {
-        Cookies.remove('token');
-        Cookies.remove('user_name');
-        setIsLoggedIn(false);
-        setPassword('');
-      })
-      .catch(function (error) {
-        if (error.response && error.response.status === 404) {
-          Cookies.remove('token');
-          Cookies.remove('user_name');
-          setIsLoggedIn(false);
-          setPassword('');
-          setShowPopup(true);
-          setPopupText('Session expired. Resetting...');
-        } else {
-          console.error('Error during logout:', error);
-        }
-      });
+    if (!isWaiting) {
+      setShowPopup(false);
+    }
   };
 
   const handleLogin = () => {
+    setPopupText("Signing in...");
+    setShowPopup(true);
+    setIsWaiting(true);
+
     axios
       .post('http://ec2-15-206-84-53.ap-south-1.compute.amazonaws.com:8097/api/v1/auth/sign_in', {
         password: password,
       })
-      .then(function (response) {
+      .then((response) => {
         Cookies.set('token', response.data.token, { expires: 1 });
         Cookies.set('user_name', response.data.user_name, { expires: 1 });
         setIsLoggedIn(true);
         setUsername(response.data.user_name);
+        setPopupText("Signed in successfully.");
       })
-      .catch(function () {
-        setShowPopup(true);
-        setPopupText('Invalid password');
+      .catch((error) => {
+        if (error.response) {
+          if (error.response.status === 406) {
+            setPopupText("Invalid credentials. Please try again.");
+          } else if (error.response.status === 404) {
+            setPopupText("User not found.");
+          } else if (error.response.status === 500) {
+            setPopupText("Server error. Please try again later.");
+          }
+        } else {
+          setPopupText("Network error. Please check your connection.");
+        }
+      })
+      .finally(() => {
+        setPassword(''); // Clear the password input
+        setIsWaiting(false);
       });
   };
 
-  const handleSelectButton = () => {
-    if (isLoggedIn) {
-      fileInputRef.current.click();
-    } else {
-      setShowPopup(true);
-      setPopupText('Need to Sign in first.');
-    }
+  const handleLogout = () => {
+    setPopupText("Signing out...");
+    setShowPopup(true);
+    setIsWaiting(true);
+
+    axios
+      .post('http://ec2-15-206-84-53.ap-south-1.compute.amazonaws.com:8097/api/v1/auth/sign_out', {
+        token: Cookies.get('token'),
+      })
+      .then(() => {
+        Cookies.remove('token');
+        Cookies.remove('user_name');
+        setIsLoggedIn(false);
+        setPassword('');
+        setPopupText("Signed out successfully.");
+        setSelectedFiles([]); // Clear selected files
+        fileInputRef.current.value = null; // Reset file input
+        setUploadedFileIndex(null); // Reset uploaded file index
+      })
+      .catch((error) => {
+        if (error.response) {
+          if (error.response.status === 406) {
+            setPopupText("Invalid logout request.");
+          } else if (error.response.status === 404) {
+            Cookies.remove('token');
+            Cookies.remove('user_name');
+            setIsLoggedIn(false);
+            setPassword('');
+            setPopupText("Session expired. Resetting...");
+          } else if (error.response.status === 500) {
+            setPopupText("Server error during logout.");
+          }
+        } else {
+          setPopupText("Network error. Please check your connection.");
+        }
+      })
+      .finally(() => setIsWaiting(false));
   };
 
   const handleUploadButton = () => {
-    if (isLoggedIn) {
-      if (selectedFiles.length === 0) {
-        setShowPopup(true);
-        setPopupText('No file selected.');
-      } else {
-        const file = selectedFiles[0];
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('token', Cookies.get('token'));
-        fetch('http://ec2-15-206-84-53.ap-south-1.compute.amazonaws.com:8097/api/v1/file/upload', {
-          method: 'POST',
-          body: formData,
-        })
-          .then((response) => {
-            if (response.ok) {
-              setShowPopup(true);
-              setPopupText('Upload complete.');
-              setUploadedFileIndex(0); // Assuming one file at a time; update index for the uploaded file
-            } else {
-              throw new Error('Upload failed.');
-            }
-          })
-          .catch((error) => {
-            setShowPopup(true);
-            setPopupText(`Error: ${error.message}`);
-          });
-      }
-    } else {
+    if (!isLoggedIn) {
       setShowPopup(true);
-      setPopupText('Need to Sign in first.');
+      setPopupText("Need to Sign in first.");
+      return;
     }
+
+    if (selectedFiles.length === 0) {
+      setShowPopup(true);
+      setPopupText("No file selected.");
+      return;
+    }
+
+    const file = selectedFiles[0];
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('token', Cookies.get('token'));
+
+    setPopupText("Uploading...");
+    setShowPopup(true);
+    setIsWaiting(true);
+
+    fetch('http://ec2-15-206-84-53.ap-south-1.compute.amazonaws.com:8097/api/v1/file/upload', {
+      method: 'POST',
+      body: formData,
+    })
+      .then((response) => {
+        if (response.status === 200) {
+          setPopupText("Upload complete.");
+          setUploadedFileIndex(0);
+        } else if (response.status === 400) {
+          setPopupText("Bad request. Please check the file format.");
+        } else if (response.status === 404) {
+          setPopupText("Session expired. Resetting...");
+          Cookies.remove('token');
+          Cookies.remove('user_name');
+          setIsLoggedIn(false);
+        } else if (response.status === 406) {
+          setPopupText("File not acceptable. Please check the requirements.");
+        } else if (response.status === 500) {
+          setPopupText("Server error. Upload failed.");
+        }
+      })
+      .catch(() => {
+        setPopupText("Network error during upload.");
+      })
+      .finally(() => setIsWaiting(false));
   };
 
   const handleFileChange = (event) => {
@@ -114,14 +155,22 @@ function App() {
       (file) => file.name.endsWith('.xls') || file.name.endsWith('.xlsx')
     );
     setSelectedFiles(files);
-    setUploadedFileIndex(null); // Reset uploaded file index when new files are selected
-    console.log('Selected files:', files);
+    setUploadedFileIndex(null);
   };
 
   const handleClearFiles = () => {
     setSelectedFiles([]);
     fileInputRef.current.value = null;
-    setUploadedFileIndex(null); // Reset uploaded file index when files are cleared
+    setUploadedFileIndex(null);
+  };
+
+  const handleSelectButton = () => {
+    if (isLoggedIn) {
+      fileInputRef.current.click();
+    } else {
+      setShowPopup(true);
+      setPopupText("Need to Sign in first.");
+    }
   };
 
   return (
@@ -136,7 +185,7 @@ function App() {
           <div className="flex space-x-2">
             {isLoggedIn ? (
               <>
-                <p className="text-lg">{username}</p>
+                <p className="text-lg">Welcome, {username}</p> {/* Decorate the username here */}
                 <button onClick={handleLogout} className="bg-gray-200 border rounded px-4 py-1">
                   Sign Out
                 </button>
@@ -173,12 +222,14 @@ function App() {
                 <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
                   <div className="bg-white p-8 rounded shadow-lg w-80 h-32">
                     <p className="text-lg text-gray-700">{popupText}</p>
-                    <button
-                      className="mt-4 ml-48 bg-[#d6d3d1] hover:bg-[#a1a1aa] text-black font-semibold py-2 px-4 border border-black rounded"
-                      onClick={closePopup}
-                    >
-                      Close
-                    </button>
+                    {!isWaiting && (
+                      <button
+                        className="mt-4 ml-48 bg-[#d6d3d1] hover:bg-[#a1a1aa] text-black font-semibold py-2 px-4 border border-black rounded"
+                        onClick={closePopup}
+                      >
+                        Close
+                      </button>
+                    )}
                   </div>
                 </div>
               )}
