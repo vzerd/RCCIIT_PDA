@@ -21,12 +21,12 @@ public class FileController{
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file,
-                                      @RequestParam("token") String token) throws IOException {
+                                      @RequestParam("token") String token){
         return fileService.uploadFileService(file, token);
     }
 
     @GetMapping("/get_analysis")
-    public ResponseEntity<?> getAnalysis() throws IOException{
-        return fileService.getAnalysisService();
+    public ResponseEntity<?> getAnalysis(@RequestParam("token") String token){
+        return fileService.getAnalysisService(token);
     }
 }

@@ -286,7 +286,13 @@ function App() {
               </button>
             </div>
           </div>
-          <div className="w-full mt-4 my-16 bg-white rounded"></div>
+          <div className="w-full mt-4 my-16 bg-white rounded">
+          <button
+            className="bg-[#d6d3d1] hover:bg-[#a1a1aa] text-black text-lg font-semibold py-1 px-6 border border-black rounded"
+          >
+            Analyze
+          </button>
+          </div>
         </main>
         <div className="w-full h-12 fixed bottom-0 left-0 right-0 bg-[#155e75]"></div>
       </div>
