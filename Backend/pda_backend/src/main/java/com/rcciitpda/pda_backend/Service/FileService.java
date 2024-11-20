@@ -2,7 +2,6 @@ package com.rcciitpda.pda_backend.Service;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.rcciitpda.pda_backend.Repository.UserRepository;
@@ -15,7 +14,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
@@ -78,6 +76,8 @@ public class FileService{
                         S3Object s3Object = s3.getObject(bucket_name, keyName);
                         S3ObjectInputStream inputStream = s3Object.getObjectContent();
 
+                        s3.deleteObject(bucket_name, keyName);
+
                         HttpHeaders headers = new HttpHeaders();
                         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
                         headers.setContentDispositionFormData("attachment", keyName);
@@ -87,7 +87,7 @@ public class FileService{
                                 headers,
                                 HttpStatus.valueOf(200)
                         );
-                    } catch (AmazonS3Exception e) {
+                    } catch (AmazonServiceException e) {
                         if ("NoSuchKey".equals(e.getErrorCode())) {
                             retryCount++;
                             try {
