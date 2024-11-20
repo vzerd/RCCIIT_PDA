@@ -151,6 +151,37 @@ function App() {
       .finally(() => setIsWaiting(false));
   };
 
+  const handleAnalyzeButton = () => {
+    setPopupText("Analyzing...");
+    setShowPopup(true);
+    setIsWaiting(true);
+
+    axios
+      .get("http://ec2-15-206-84-53.ap-south-1.compute.amazonaws.com:8097/api/v1/file/get_analysis", {
+        params: { token: Cookies.get('token') },
+      })
+      .then((response) => {
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'analysis.xlsx'); // Specify the file name
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setPopupText("Analysis complete.");
+      })
+      .catch((error) => {
+        if (error.response) {
+          setPopupText("Analysis failed. Please try again.");
+        } else {
+          setPopupText("Network error. Please check your connection.");
+        }
+      })
+      .finally(() => {
+        setIsWaiting(false);
+      });
+  };
+
   const handleFileChange = (event) => {
     const files = Array.from(event.target.files).filter(
       (file) => file.name.endsWith('.xls') || file.name.endsWith('.xlsx')
@@ -289,6 +320,8 @@ function App() {
           <div className="w-full mt-4 my-16 bg-white rounded">
           <button
             className="bg-[#d6d3d1] hover:bg-[#a1a1aa] text-black text-lg font-semibold py-1 px-6 border border-black rounded"
+            onClick={handleAnalyzeButton}
+            disabled={isWaiting} // Disable button during analysis
           >
             Analyze
           </button>
