@@ -94,12 +94,15 @@ public class FileService{
                                 Thread.sleep(2000);
                             } catch (InterruptedException interruptedException) {
                                 Thread.currentThread().interrupt();
+                                System.out.println(e.getMessage());
                                 return new ResponseEntity<>(HttpStatus.valueOf(500));
                             }
                         } else {
+                            System.out.println(e.getMessage());
                             return new ResponseEntity<>(HttpStatus.valueOf(500));
                         }
                     } catch (Exception e) {
+                        System.out.println(e.getMessage());
                         return new ResponseEntity<>(HttpStatus.valueOf(500));
                     }
                 }
