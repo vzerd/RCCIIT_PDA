@@ -13,6 +13,9 @@ function App() {
   const fileInputRef = useRef(null);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [uploadedFileIndex, setUploadedFileIndex] = useState(null);
+  const [isAnalyzeDisabled, setIsAnalyzeDisabled] = useState(true);
+  const [fileStatus, setFileStatus] = useState('');
+
 
   useEffect(() => {
     if (Cookies.get('token') && Cookies.get('user_name')) {
@@ -130,7 +133,9 @@ function App() {
       .then((response) => {
         if (response.status === 200) {
           setPopupText("Upload complete.");
+          setFileStatus("Uploaded");
           setUploadedFileIndex(0);
+          setIsAnalyzeDisabled(false);
         } else if (response.status === 400) {
           setPopupText("Bad request. Please check the file format.");
         } else if (response.status === 404) {
@@ -155,31 +160,59 @@ function App() {
     setPopupText("Analyzing...");
     setShowPopup(true);
     setIsWaiting(true);
+    setIsAnalyzeDisabled(true);
 
     axios
       .get("http://ec2-15-206-84-53.ap-south-1.compute.amazonaws.com:8097/api/v1/file/get_analysis", {
         params: { token: Cookies.get('token') },
-      })
+              responseType: 'blob',
+            })
       .then((response) => {
-        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const blob = new Blob([response.data], {
+          type: 'application/octet-stream',
+        });
+        let fileName = 'analysis_result.xlsx';
+        const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', 'analysis.xlsx'); // Specify the file name
+        link.setAttribute('download', fileName);
         document.body.appendChild(link);
         link.click();
         link.remove();
         setPopupText("Analysis complete.");
+        setFileStatus("Analyzed"); // Update status to "Analyzed"
       })
       .catch((error) => {
-        if (error.response) {
-          setPopupText("Analysis failed. Please try again.");
+         if (error.response) {
+            switch (error.response.status) {
+              case 406:
+                setPopupText("Analysis not acceptable. Please try again.");
+                break;
+              case 404:
+                setPopupText("Session expired. Resetting...");
+                Cookies.remove('token');
+                Cookies.remove('user_name');
+                setIsLoggedIn(false);
+                setSelectedFiles([]);
+                fileInputRef.current.value = null;
+                break;
+              case 500:
+                setPopupText("Server error. Please try again later.");
+                break;
+              default:
+                setPopupText("Analysis failed. Please try again.");
+            }
         } else {
-          setPopupText("Network error. Please check your connection.");
+         setPopupText("Network error. Please check your connection.");
         }
+        // Clear file selection on any error
+          setSelectedFiles([]);
+          fileInputRef.current.value = null;
+          setFileStatus(null);
       })
-      .finally(() => {
-        setIsWaiting(false);
-      });
+    .finally(() => {
+      setIsWaiting(false);
+    });
   };
 
   const handleFileChange = (event) => {
@@ -188,13 +221,17 @@ function App() {
     );
     setSelectedFiles(files);
     setUploadedFileIndex(null);
+     if (files.length === 0) {
+        fileInputRef.current.value = null;
+      }
   };
 
-  const handleClearFiles = () => {
-    setSelectedFiles([]);
-    fileInputRef.current.value = null;
-    setUploadedFileIndex(null);
-  };
+const handleClearFiles = () => {
+  setSelectedFiles([]);
+  fileInputRef.current.value = null;
+  setUploadedFileIndex(null);
+  setFileStatus('');
+};
 
   const handleSelectButton = () => {
     if (isLoggedIn) {
@@ -296,9 +333,12 @@ function App() {
                     >
                       {file.name}
                     </a>
-                    {index === uploadedFileIndex && (
-                      <span className="ml-2 text-green-600 font-semibold">Uploaded</span>
-                    )}
+                      {fileStatus === "Analyzed" && index === uploadedFileIndex && (
+                        <span className="ml-2 text-green-500 font-semibold">Analyzed</span>
+                      )}
+                      {fileStatus === "Uploaded" && index === uploadedFileIndex && (
+                        <span className="ml-2 text-amber-500 font-semibold">Uploaded</span>
+                      )}
                   </li>
                 ))}
               </ul>
@@ -308,10 +348,13 @@ function App() {
                 </div>
               )}
             </div>
-            <div className="absolute w-full max-w-md ml-72 mt-[430px] p-6">
+            <div className="flex items-center justify-center absolute w-full max-w-md mt-[430px]">
               <button
-                className="bg-[#d6d3d1] hover:bg-[#a1a1aa] text-black text-lg font-semibold py-1 px-6 border border-black rounded"
+                className={`bg-[#d6d3d1] ${
+                  selectedFiles.length === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#a1a1aa]'
+                } text-black text-lg font-semibold py-1 px-6 border border-black rounded`}
                 onClick={handleUploadButton}
+                disabled={selectedFiles.length === 0}  // Disable if no files are selected
               >
                 Upload
               </button>
@@ -319,12 +362,15 @@ function App() {
           </div>
           <div className="w-full mt-4 my-16 bg-white rounded">
           <button
-            className="bg-[#d6d3d1] hover:bg-[#a1a1aa] text-black text-lg font-semibold py-1 px-6 border border-black rounded"
+            className={`bg-[#d6d3d1] ${
+              isAnalyzeDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#a1a1aa]'
+            } text-black text-lg font-semibold py-1 px-6 border border-black rounded`}
             onClick={handleAnalyzeButton}
-            disabled={isWaiting} // Disable button during analysis
+            disabled={isAnalyzeDisabled} // Control button state
           >
             Analyze
           </button>
+
           </div>
         </main>
         <div className="w-full h-12 fixed bottom-0 left-0 right-0 bg-[#155e75]"></div>
