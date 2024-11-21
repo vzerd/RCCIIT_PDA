@@ -23,8 +23,11 @@ public class FileService{
     UserRepository userRepository;
     @Autowired
     AmazonS3 s3;
-    @Value("${aws.s3.bucket.name}")
-    private String bucket_name;
+    @Value("${aws.s3.bucket.input.name}")
+    private String input_bucket_name;
+    @Value("${aws.s3.bucket.output.name}")
+    private String output_bucket_name;
+    private String file_extension;
     @Autowired
     public FileService(UserRepository userRepository){
         this.userRepository = userRepository;
@@ -41,13 +44,12 @@ public class FileService{
             List<String> storedTokens = userRepository.getAllTokens();
             for(String storedToken : storedTokens){
                 if(token.equals(storedToken)){
-                    String keyName = "input/"
-                            + "analysis"
-                            + Objects.requireNonNull(file.getOriginalFilename())
+                    file_extension = Objects.requireNonNull(file.getOriginalFilename())
                             .substring(file.getOriginalFilename()
-                            .lastIndexOf("."));
+                                    .lastIndexOf("."));
+                    String keyName = "analysis" + file_extension;
                     try {
-                        s3.putObject(bucket_name, keyName, file.getInputStream(), null);
+                        s3.putObject(input_bucket_name, keyName, file.getInputStream(), null);
                         return new ResponseEntity<>(HttpStatus.valueOf(200));
                     } catch (AmazonServiceException e) {
                         System.err.println(e.getErrorMessage());
@@ -70,13 +72,13 @@ public class FileService{
         List<String> storedTokens = userRepository.getAllTokens();
         for(String storedToken : storedTokens){
             if(token.equals(storedToken)){
-                String keyName = "output/" + "analysis.xlsx";
+                String keyName = "analysis" + file_extension;
                 while (retryCount < maxRetries) {
                     try {
-                        S3Object s3Object = s3.getObject(bucket_name, keyName);
+                        S3Object s3Object = s3.getObject(output_bucket_name, keyName);
                         S3ObjectInputStream inputStream = s3Object.getObjectContent();
 
-                        s3.deleteObject(bucket_name, keyName);
+                        s3.deleteObject(output_bucket_name, keyName);
 
                         HttpHeaders headers = new HttpHeaders();
                         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
