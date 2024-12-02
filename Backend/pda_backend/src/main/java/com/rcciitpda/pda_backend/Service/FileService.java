@@ -5,6 +5,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.rcciitpda.pda_backend.Repository.UserRepository;
+import org.pmw.tinylog.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
@@ -34,10 +35,13 @@ public class FileService{
     }
 
     public ResponseEntity<String> uploadFileService(MultipartFile file, String token){
+        Logger.info("file-upload | attempt | " + token);
         if(file.isEmpty()){
+            Logger.error("\tfailed | parameter error -> file");
             return new ResponseEntity<>(HttpStatus.valueOf(400));
         }
         if(token == null || token.isBlank()){
+            Logger.error("\tfailed | parameter error -> token");
             return new ResponseEntity<>(HttpStatus.valueOf(406));
         }
         try{
@@ -50,15 +54,19 @@ public class FileService{
                     String keyName = "analysis" + file_extension;
                     try {
                         s3.putObject(input_bucket_name, keyName, file.getInputStream(), null);
+                        Logger.info("\tsuccess");
                         return new ResponseEntity<>(HttpStatus.valueOf(200));
                     } catch (AmazonServiceException e) {
                         System.err.println(e.getErrorMessage());
+                        Logger.error("\tfailed | S3 error -> putObject() failed");
                         return new ResponseEntity<>(HttpStatus.valueOf(500));
                     }
                 }
             }
+            Logger.error("\tfailed | value error -> data not found");
             return new ResponseEntity<>(HttpStatus.valueOf(404));
         }catch(Exception e){
+            Logger.error("\tfailed | API error -> uploadFileService() failed");
             return new ResponseEntity<>(HttpStatus.valueOf(500));
         }
     }
