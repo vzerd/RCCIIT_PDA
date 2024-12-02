@@ -25,31 +25,26 @@ public class AuthService{
     public ResponseEntity<String> signInService(Users user){
 
         if(user.getPassword() == null || user.getPassword().isBlank()){
-            System.out.println("Error: 1A");
+            return new ResponseEntity<>(HttpStatus.valueOf(406));
+        }
+        if(user.getName() == null || user.getName().isBlank()){
             return new ResponseEntity<>(HttpStatus.valueOf(406));
         }
         try{
-            List<String> passwords = Collections.singletonList(userRepository.getAllPasswords());
-            for(String password : passwords){
-                if(user.getPassword().equals(password)){
-                    UUID newToken = generateNewToken();
-                    int rowsAffected = userRepository.updateTokenByPassword(
-                            newToken.toString(), user.getPassword());
-                    if(rowsAffected == 1){
-                        String name = userRepository.getNameByPassword(password);
-                        return new ResponseEntity<>("{\"token\":\"" + newToken + "\","
-                                + "\"user_name\":\"" + name + "\"}",
-                                HttpStatus.valueOf(200));
-                    }
-                    System.out.println("Error: 1B");
-                    return new ResponseEntity<>(HttpStatus.valueOf(500));
+            String password = userRepository.getPasswordByName(user.getName());
+            if(user.getPassword().equals(password)){
+                UUID newToken = generateNewToken();
+                int rowsAffected = userRepository.updateTokenByName(
+                        newToken.toString(), user.getName());
+                if(rowsAffected == 1){
+                    return new ResponseEntity<>("{\"token\":\"" + newToken + "\","
+                            + "\"username\":\"" + user.getName() + "\"}",
+                            HttpStatus.valueOf(200));
                 }
+                return new ResponseEntity<>(HttpStatus.valueOf(500));
             }
-            System.out.println("Error: 1C");
             return new ResponseEntity<>(HttpStatus.valueOf(404));
-
         }catch(DataAccessException e){
-            System.out.println("Error: 1D");
             return new ResponseEntity<>(HttpStatus.valueOf(500));
         }
     }
@@ -58,7 +53,6 @@ public class AuthService{
     public ResponseEntity<String> signOutService(Users user){
 
         if(user.getToken() == null || user.getToken().isBlank()){
-            System.out.println("Error: 2A");
             return new ResponseEntity<>(HttpStatus.valueOf(406));
         }
         try{
@@ -66,10 +60,8 @@ public class AuthService{
             if(rowsAffected == 1){
                 return new ResponseEntity<>(HttpStatus.valueOf(200));
             }
-            System.out.println("Error: 2B");
             return new ResponseEntity<>(HttpStatus.valueOf(404));
         }catch(DataAccessException e){
-            System.out.println("Error: 2C");
             return new ResponseEntity<>(HttpStatus.valueOf(500));
         }
     }
