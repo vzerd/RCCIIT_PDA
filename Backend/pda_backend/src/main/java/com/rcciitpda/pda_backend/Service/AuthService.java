@@ -34,6 +34,10 @@ public class AuthService{
         }
         try{
             String password = userRepository.getPasswordByName(user.getName());
+            if(password == null){
+                Logger.error("\tfailed | value error -> data not found");
+                return new ResponseEntity<>(HttpStatus.valueOf(404));
+            }
             if(user.getPassword().equals(password)){
                 UUID newToken = generateNewToken();
                 int rowsAffected = userRepository.updateTokenByName(
@@ -47,8 +51,8 @@ public class AuthService{
                 Logger.error("\tfailed | database error -> updateTokenByName() failed");
                 return new ResponseEntity<>(HttpStatus.valueOf(500));
             }
-            Logger.error("\tfailed | value error -> data not found");
-            return new ResponseEntity<>(HttpStatus.valueOf(404));
+            Logger.error("\tfailed | value error -> password mismatched");
+            return new ResponseEntity<>(HttpStatus.valueOf(406));
         }catch(DataAccessException e){
             Logger.error("\tfailed | API error -> signInService() failed");
             return new ResponseEntity<>(HttpStatus.valueOf(500));
