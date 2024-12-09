@@ -11,17 +11,14 @@ public interface UserRepository extends JpaRepository<Users, Integer> {
     @Query("SELECT token FROM Users")
     List<String> getAllTokens();
 
-    @Query("SELECT name FROM Users WHERE password = ?1")
-    String getNameByPassword(String password);
-
     @Modifying
     @Query("UPDATE Users SET token = null WHERE token = ?1")
     int updateTokenToNull(String token);
 
-    @Query("SELECT password FROM Users")
-    String getAllPasswords();
-
     @Modifying
-    @Query("UPDATE Users SET token = ?1 WHERE password = ?2")
-    int updateTokenByPassword(String token, String password);
+    @Query("UPDATE Users SET token = ?1 WHERE name = ?2")
+    int updateTokenByName(String token, String name);
+
+    @Query("SELECT password FROM Users WHERE name = ?1")
+    String getPasswordByName(String name);
 }
