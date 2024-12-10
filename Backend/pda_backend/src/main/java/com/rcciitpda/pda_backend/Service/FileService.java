@@ -98,6 +98,7 @@ public class FileService{
                                 HttpStatus.valueOf(200)
                         );
                     } catch (AmazonServiceException e) {
+                        Logger.error(e.getMessage());
                         if ("NoSuchKey".equals(e.getErrorCode())) {
                             retryCount++;
                             try {
@@ -110,6 +111,7 @@ public class FileService{
                             return new ResponseEntity<>(HttpStatus.valueOf(500));
                         }
                     } catch (Exception e) {
+                        Logger.error(e.getMessage());
                         return new ResponseEntity<>(HttpStatus.valueOf(500));
                     }
                 }
