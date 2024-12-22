@@ -103,53 +103,50 @@ public class FileService {
 
         int maxRetries = 60;
         int retryCount = 0;
+        Path filePath = Paths.get(OUTPUT_DIR, "analysis.xlsx");
         try {
             List<String> storedTokens = userRepository.getAllTokens();
             for (String storedToken : storedTokens) {
                 if (token.equals(storedToken)) {
-                    String keyName = "analysis.xlsx";
-                    Path filePath;
-                    while (retryCount < maxRetries) {
-                        filePath = Paths.get(OUTPUT_DIR, keyName);
 
+                    // Retry logic for file availability
+                    while (retryCount < maxRetries) {
                         if (Files.exists(filePath) && Files.isReadable(filePath)) {
+                            // File exists, try to send it
                             try (InputStream inputStream = new FileInputStream(filePath.toFile())) {
                                 HttpHeaders headers = new HttpHeaders();
                                 headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-                                headers.setContentDispositionFormData("attachment", keyName);
+                                headers.setContentDispositionFormData("attachment", "analysis.xlsx");
 
-                                // Return ResponseEntity only after stream is used
-                                return new ResponseEntity<>(
-                                        new InputStreamResource(inputStream),
-                                        headers,
-                                        HttpStatus.valueOf(200)
-                                );
+                                return new ResponseEntity<>(new InputStreamResource(inputStream), headers, HttpStatus.OK);
                             } catch (IOException e) {
-                                Logger.error("Error reading file: " + e.getMessage());
-                                return new ResponseEntity<>(HttpStatus.valueOf(500));
+                                Logger.error("Error reading file: ", e);
+                                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
                             }
                         }
 
+                        // Retry logic: wait for 1 second before retrying
                         try {
-                            Thread.sleep(1000); // Wait 1 second before retrying
+                            Thread.sleep(1000);
                         } catch (InterruptedException e) {
                             Thread.currentThread().interrupt();
-                            Logger.error("Retry interrupted: " + e.getMessage());
-                            return new ResponseEntity<>(HttpStatus.valueOf(500));
+                            Logger.error("Retry interrupted: ", e);
+                            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
                         }
+
                         retryCount++;
                     }
 
-                    Logger.error("File not found after retries: " + keyName);
-                    return new ResponseEntity<>(HttpStatus.valueOf(404));
+                    Logger.error("File not found after retries: analysis.xlsx");
+                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
                 }
             }
 
             Logger.error("Token not found: " + token);
-            return new ResponseEntity<>(HttpStatus.valueOf(404));
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            Logger.error("Unexpected error in getAnalysisService: " + e.getMessage());
-            return new ResponseEntity<>(HttpStatus.valueOf(500));
+            Logger.error("Unexpected error in getAnalysisService: ", e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
