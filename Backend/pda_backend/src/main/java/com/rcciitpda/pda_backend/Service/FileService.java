@@ -24,7 +24,7 @@ import java.util.List;
 @Service
 public class FileService {
 
-    private static final String STORAGE_DIR = "C:Users/Administrator/Desktop/FILE_STORE";
+    private static final String STORAGE_DIR = "C:/Users/Administrator/Desktop/FILE_STORE";
     private static final String INPUT_DIR = STORAGE_DIR + "/input";
     private static final String OUTPUT_DIR = STORAGE_DIR + "/output";
 
