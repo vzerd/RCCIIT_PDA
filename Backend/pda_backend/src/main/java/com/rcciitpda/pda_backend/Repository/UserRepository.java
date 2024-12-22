@@ -21,4 +21,7 @@ public interface UserRepository extends JpaRepository<Users, Integer> {
 
     @Query("SELECT password FROM Users WHERE name = ?1")
     String getPasswordByName(String name);
+
+    @Query("SELECT name FROM Users WHERE token = ?1")
+    boolean existsByToken(String token);
 }
