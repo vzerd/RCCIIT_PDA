@@ -48,29 +48,45 @@ public class FileService {
 
     public ResponseEntity<String> uploadFileService(MultipartFile file, String token) {
         Logger.info("file-upload | attempt | " + token);
+
         if (file.isEmpty()) {
             Logger.error("\tfailed | parameter error -> file");
             return new ResponseEntity<>(HttpStatus.valueOf(400));
         }
+
         if (token == null || token.isBlank()) {
             Logger.error("\tfailed | parameter error -> token");
             return new ResponseEntity<>(HttpStatus.valueOf(406));
         }
+
         try {
             List<String> storedTokens = userRepository.getAllTokens();
+
             for (String storedToken : storedTokens) {
                 if (token.equals(storedToken)) {
-                    try {
-                        file_name = file.getOriginalFilename();
-                        Path filePath = Paths.get(INPUT_DIR, file_name);
-                        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-                        return new ResponseEntity<>(HttpStatus.valueOf(200));
-                    } catch (Exception e) {
-                        Logger.error("Error storing file: " + e.getMessage());
-                        return new ResponseEntity<>(HttpStatus.valueOf(500));
+
+                    File outputDirectory = new File(OUTPUT_DIR);
+                    File[] outputFiles = outputDirectory.listFiles();
+                    if (outputFiles != null) {
+                        for (File outputFile : outputFiles) {
+                            if (outputFile.isFile()) {
+                                if (outputFile.delete()) {
+                                    Logger.info("Deleted output file: " + outputFile.getName());
+                                } else {
+                                    Logger.error("Failed to delete output file: " + outputFile.getName());
+                                }
+                            }
+                        }
                     }
+
+                    // Save the uploaded file to the /input directory
+                    file_name = file.getOriginalFilename();
+                    Path filePath = Paths.get(INPUT_DIR, file_name);
+                    Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+                    return new ResponseEntity<>(HttpStatus.valueOf(200));
                 }
             }
+
             Logger.error("\tfailed | value error -> data not found");
             return new ResponseEntity<>(HttpStatus.valueOf(404));
         } catch (Exception e) {
@@ -78,6 +94,7 @@ public class FileService {
             return new ResponseEntity<>(HttpStatus.valueOf(500));
         }
     }
+
 
     public ResponseEntity<?> getAnalysisService(String token) {
         if (token == null || token.isBlank()) {
