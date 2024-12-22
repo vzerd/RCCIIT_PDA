@@ -99,52 +99,55 @@ public class FileService {
 
     public ResponseEntity<?> getAnalysisService(String token) {
         if (token == null || token.isBlank()) {
-            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<>(HttpStatus.valueOf(406));
         }
-
-        Path filePath = Paths.get(OUTPUT_DIR, "analysis.xlsx");
         int maxRetries = 60;
-
+        int retryCount = 0;
+        Path filePath = Paths.get(OUTPUT_DIR, "analysis.xlsx");
         try {
-            if (!isValidToken(token)) {
-                Logger.error("Invalid token: " + token);
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            List<String> storedTokens = userRepository.getAllTokens();
+            for (String storedToken : storedTokens) {
+                if (token.equals(storedToken)) {
+
+                    // Retry logic for file availability
+                    while (retryCount < maxRetries) {
+                        if (Files.exists(filePath) && Files.isReadable(filePath)) {
+                            // File exists, use FileSystemResource
+                            try {
+                                FileSystemResource fileResource = new FileSystemResource(filePath.toFile());
+                                HttpHeaders headers = new HttpHeaders();
+                                headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+                                headers.setContentDispositionFormData("attachment", "analysis.xlsx");
+
+                                return new ResponseEntity<>(fileResource, headers, HttpStatus.OK);
+                            } catch (Exception e) {
+                                Logger.error("Error preparing file response: ", e);
+                                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+                            }
+                        }
+
+
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                            Logger.error("Retry interrupted: ", e);
+                            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+                        }
+
+                        retryCount++;
+                    }
+
+                    Logger.error("File not found after retries: analysis.xlsx");
+                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                }
             }
 
-            boolean fileAvailable = waitForFile(filePath, maxRetries);
-            if (!fileAvailable) {
-                Logger.error("File not found after retries: " + filePath);
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-            headers.setContentDispositionFormData("attachment", "analysis.xlsx");
-
-            return new ResponseEntity<>(new FileSystemResource(filePath), headers, HttpStatus.OK);
+            Logger.error("Token not found: " + token);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             Logger.error("Unexpected error in getAnalysisService: ", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }
-
-    private boolean isValidToken(String token) {
-        return userRepository.existsByToken(token);
-    }
-
-    private boolean waitForFile(Path filePath, int maxRetries){
-        for (int i = 0; i < maxRetries; i++) {
-            if (Files.exists(filePath) && Files.isReadable(filePath)) {
-                return true;
-            }
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                Logger.error("Retry interrupted: ", e);
-                return false;
-            }
-        }
-        return false;
     }
 }
