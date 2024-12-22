@@ -118,6 +118,7 @@ public class FileService {
                                 headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
                                 headers.setContentDispositionFormData("attachment", keyName);
 
+                                // Return ResponseEntity only after stream is used
                                 return new ResponseEntity<>(
                                         new InputStreamResource(inputStream),
                                         headers,
