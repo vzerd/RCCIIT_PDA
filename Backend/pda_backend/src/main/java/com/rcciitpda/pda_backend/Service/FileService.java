@@ -80,13 +80,28 @@ public class FileService {
                         }
                     }
 
+                    // Clear input directory
+                    File inputDirectory = new File(INPUT_DIR);
+                    File[] inputFiles = inputDirectory.listFiles();
+                    if (inputFiles != null) {
+                        for (File inputFile : inputFiles) {
+                            if (inputFile.isFile()) {
+                                if (inputFile.delete()) {
+                                    Logger.info("Deleted input file: " + inputFile.getName());
+                                } else {
+                                    Logger.error("Failed to delete input file: " + inputFile.getName());
+                                }
+                            }
+                        }
+                    }
+
                     // Store file name and extension
                     String fileName = file.getOriginalFilename();
+                    String fileExtension = "unknown";
                     if (fileName != null && fileName.contains(".")) {
                         fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1);
                         Logger.info("File extension determined: " + fileExtension);
                     } else {
-                        fileExtension = "unknown";
                         Logger.warn("File extension could not be determined. Defaulting to 'unknown'.");
                     }
 
@@ -104,6 +119,7 @@ public class FileService {
             return new ResponseEntity<>(HttpStatus.valueOf(500));
         }
     }
+
 
     public ResponseEntity<?> getAnalysisService(String token) {
         Logger.info("get-analysis | attempt | token: " + token);
