@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.rcciitpda</groupId>
 	<artifactId>pda_backend</artifactId>
-	<version>0.1.20</version>
+	<version>0.1.29</version>
 	<name>pda_backend</name>
 	<description>RCCIIT PDA Backend System.</description>
 	<url/>

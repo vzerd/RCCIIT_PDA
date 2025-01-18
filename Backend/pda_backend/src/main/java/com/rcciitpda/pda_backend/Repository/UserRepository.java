@@ -21,4 +21,5 @@ public interface UserRepository extends JpaRepository<Users, Integer> {
 
     @Query("SELECT password FROM Users WHERE name = ?1")
     String getPasswordByName(String name);
+
 }
