@@ -1,4 +1,4 @@
-# RCCIIT PDA (Project Data Analysis)
+# RCCIIT PDA (Placement Data Analysis)
 
 Welcome to the RCCIIT PDA repository! This project is focused on analyzing and processing academic and placement data, providing insights and visualizations to aid decision-making and enhance understanding.
 
