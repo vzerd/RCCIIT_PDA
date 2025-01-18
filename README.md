@@ -1,81 +1,106 @@
-# RCCIIT Placement Data Analytics and Prediction (RCCIIT_PDA)
+# RCCIIT PDA (Project Data Analysis)
 
-This project aims to provide a comprehensive solution for analyzing and predicting placement trends for students at RCC Institute of Information Technology (RCCIIT). It utilizes Java-based data processing and visualization techniques to deliver insights and predictions based on historical placement data.
-
-## Table of Contents
-
-1. [Overview](#overview)
-2. [Features](#features)
-3. [Installation](#installation)
-4. [Usage](#usage)
-5. [Contributing](#contributing)
-6. [License](#license)
+Welcome to the RCCIIT PDA repository! This project is focused on analyzing and processing academic and placement data, providing insights and visualizations to aid decision-making and enhance understanding.
 
 ## Overview
 
-RCCIIT_PDA is designed to simplify the process of analyzing past placement data and forecasting future trends. It assists educational institutions and placement cells in making data-driven decisions by processing raw placement data, performing statistical analysis, and providing meaningful insights through visualizations.
+This project explores and processes data related to student placements and academic performance, utilizing data analysis and machine learning techniques. It aims to provide actionable insights and accurate placement predictions based on historical data.
 
 ## Features
 
-- **Data Analysis**: In-depth analysis of historical placement data, including success rates, industry trends, and department-wise breakdowns.
-- **Prediction Models**: Integration of machine learning techniques to predict student placement probabilities based on their academic and extracurricular profiles.
-- **Custom Visualizations**: Graphical representations of insights, such as bar charts, pie charts, and line graphs.
-- **User-Friendly Interface**: Simple and intuitive interface for data input and result visualization.
-- **Scalable Solution**: Designed to handle large datasets efficiently.
+- **Data Preprocessing:**
+  - Handling missing values.
+  - Encoding categorical variables.
+  - Data normalization.
 
-## Installation
+- **Statistical Analysis:**
+  - Welch’s t-tests for feature selection.
 
-To set up the project locally, follow these steps:
+- **Machine Learning Model:**
+  - Implementation of an XGBoost classifier for placement prediction.
+  - Hyperparameter tuning using GridSearchCV.
+  - Performance evaluation through cross-validation and AUC-ROC metrics.
 
-1. **Clone the Repository**:
+- **Imbalanced Data Handling:**
+  - SMOTE (Synthetic Minority Over-sampling Technique) to balance classes.
 
+- **Automated File Processing:**
+  - Monitoring directories for input Excel files.
+  - Processing and generating predictions.
+  - Automated handling of file operations.
+
+## Technologies Used
+
+- **Programming Languages:** Python
+- **Libraries:**
+  - Data Analysis: Pandas, NumPy
+  - Machine Learning: Scikit-learn, XGBoost
+  - Data Visualization: Matplotlib, Seaborn
+- **Tools:** SMOTE, GridSearchCV
+
+## Prerequisites
+
+Before running the project, ensure you have the following installed:
+
+- Python 3.8 or higher
+- Required Python libraries (listed in `requirements.txt`)
+
+## Getting Started
+
+### Installation
+
+1. Clone this repository:
    ```bash
    git clone https://github.com/Monodipta/RCCIIT_PDA.git
    ```
 
-2. **Navigate to the Project Directory**:
-
+2. Navigate to the project directory:
    ```bash
    cd RCCIIT_PDA
    ```
 
-3. **Compile the Java Source Code**:
-
+3. Install the dependencies:
    ```bash
-   javac -d bin src/*.java
+   pip install -r requirements.txt
    ```
 
-4. **Run the Application**:
+### Usage
 
-   ```bash
-   java -cp bin Main
-   ```
+1. Place the input Excel files in the designated input directory.
+2. Run the script to process the files and generate predictions.
+3. Check the output directory for the processed files with predictions.
 
-## Usage
+## Machine Learning Pipeline
 
-1. **Data Input**:
-   - Prepare a CSV or Excel file containing historical placement data. Ensure the data includes fields like `Student Name`, `Roll Number`, `Department`, `CGPA`, `Placement Status`, etc.
-   - Load the data into the application through the input interface.
+1. **Data Preparation:**
+   - Drop irrelevant columns.
+   - Encode categorical variables.
+   - Handle missing values.
 
-2. **Analysis**:
-   - The application will process the data and generate insights, such as placement statistics, company preferences, and department-specific trends.
+2. **Feature Engineering:**
+   - Use Welch’s t-tests to analyze numerical features.
 
-3. **Prediction**:
-   - For new students, input their academic and personal details. The prediction module will calculate their placement probability and display the results.
+3. **Model Training:**
+   - Train an XGBoost classifier with optimized hyperparameters.
+   - Evaluate the model with cross-validation and AUC-ROC scores.
 
-4. **Export Results**:
-   - Save the analyzed data and predictions as reports in a downloadable format.
+4. **Testing Pipeline:**
+   - Monitor input directory for Excel files.
+   - Process the files using the trained model.
+   - Generate user-friendly outputs with decoded predictions.
 
-## Contributing
+## Results
 
-Contributions are welcome to enhance the functionality of RCCIIT_PDA. To contribute:
-
-1. Fork the repository.
-2. Create a feature branch: `git checkout -b feature-name`.
-3. Commit your changes: `git commit -m "Add feature"`.
-4. Push to the branch: `git push origin feature-name`.
-5. Submit a pull request.
+- Achieved a mean cross-validation accuracy of ~79.68%.
+- Test accuracy of 81.21%.
+- Micro-average AUC-ROC: 0.95
+- Macro-average AUC-ROC: 0.93
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details. 
+This project is licensed under the MIT License. See the LICENSE file for more details.
+
+---
+
+Thank you for exploring RCCIIT PDA! For any queries or feedback, feel free to reach out.
+
