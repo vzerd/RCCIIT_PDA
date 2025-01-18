@@ -31,44 +31,30 @@ This project explores and processes data related to student placements and acade
 
 ## Technologies Used
 
-- **Programming Languages:** Python
-- **Libraries:**
-  - Data Analysis: Pandas, NumPy
-  - Machine Learning: Scikit-learn, XGBoost
-  - Data Visualization: Matplotlib, Seaborn
-- **Tools:** SMOTE, GridSearchCV
+- **Frontend:** React.js
+  - Provides a user-friendly interface for uploading data, performing analysis, and viewing results.
+
+- **Backend:** Spring Boot
+  - Manages API requests, user authentication, and communication with the ML model.
+
+- **Machine Learning:** Python
+  - Includes preprocessing, model training, and prediction using libraries such as Pandas, NumPy, Scikit-learn, and XGBoost.
 
 ## Prerequisites
 
 Before running the project, ensure you have the following installed:
 
-- Python 3.8 or higher
-- Required Python libraries (listed in `requirements.txt`)
+- Node.js and npm (for the frontend)
+- JDK 11 or higher (for the backend)
+- Python 3.8 or higher (for the machine learning model)
+- MySQL Server
 
-## Getting Started
+## Usage
 
-### Installation
-
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/Monodipta/RCCIIT_PDA.git
-   ```
-
-2. Navigate to the project directory:
-   ```bash
-   cd RCCIIT_PDA
-   ```
-
-3. Install the dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-### Usage
-
-1. Place the input Excel files in the designated input directory.
-2. Run the script to process the files and generate predictions.
-3. Check the output directory for the processed files with predictions.
+1. Start the backend server using Spring Boot.
+2. Start the frontend React application.
+3. Use the interface to upload placement data, analyze trends, and view predictions.
+4. The backend communicates with the Python ML model for predictions and returns the results to the frontend.
 
 ## Machine Learning Pipeline
 
